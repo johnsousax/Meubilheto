@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Bilheto Digital — Painel Master</title>
+<meta name="robots" content="noindex,nofollow" />
+<meta name="theme-color" content="#12151C" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papel:#F4F5F7; --carta:#FFFFFF; --tinta:#10141C; --grafite:#626C7E;
+  --linha:#E1E5EC; --linha2:#EDEFF3;
+  --casco:#12151C; --casco2:#1B1F29; --cascoTxt:#A8B0C0;
+  --cobalto:#1F3FD1; --cobalto-fraco:#EDF0FE;
+  --verde:#0E8A5F; --verde-fraco:#E6F5EF;
+  --vermelho:#C8323C; --vermelho-fraco:#FCECEE;
+  --ambar:#B8730A; --ambar-fraco:#FDF3E3;
+  --r:10px;
+  --dsp:'Space Grotesk',system-ui,sans-serif;
+  --bdy:'Inter',system-ui,sans-serif;
+  --num:'IBM Plex Mono',ui-monospace,monospace;
+  --rail:230px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--papel);color:var(--tinta);font-family:var(--bdy);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cobalto);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums}
+.dsp{font-family:var(--dsp);letter-spacing:-.02em}
+.mute{color:var(--grafite)}
+
+/* ---------- boot ---------- */
+#boot{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:14px;padding:24px}
+#boot .spin{width:22px;height:22px;border:2px solid var(--linha);border-top-color:var(--cobalto);border-radius:50%;animation:girar .8s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+#boot .falha{max-width:460px;background:var(--carta);border:1px solid var(--vermelho);border-radius:var(--r);padding:20px}
+#boot .falha h1{font-family:var(--dsp);font-size:19px;margin-bottom:8px}
+#boot code{display:block;font-family:var(--num);font-size:11px;color:var(--grafite);background:var(--papel);border-radius:8px;padding:10px;margin-top:10px;white-space:pre-wrap}
+
+/* ---------- estrutura ---------- */
+.app{display:grid;grid-template-columns:var(--rail) 1fr;min-height:100vh}
+.rail{background:var(--casco);color:var(--cascoTxt);display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;padding:18px 12px}
+.marca{display:flex;align-items:center;gap:9px;padding:6px 10px 20px}
+.marca .selo{width:26px;height:26px;border-radius:7px;background:var(--cobalto);position:relative;flex:none}
+.marca .selo:after{content:"";position:absolute;inset:9px 6px;border-left:2px solid #fff;border-right:2px solid #fff;opacity:.9}
+.marca b{color:#fff;font-family:var(--dsp);font-size:15px;letter-spacing:-.02em;display:block;line-height:1.15}
+.marca small{font-family:var(--num);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#6C7788}
+.nav{display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+.nav .grupo{font-family:var(--num);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:#5B6473;padding:16px 10px 6px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;
+  padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--cascoTxt);font-size:14px}
+.nav button:hover{background:var(--casco2);color:#fff}
+.nav button.on{background:var(--casco2);color:#fff}
+.nav button.on .ic{background:var(--cobalto)}
+.ic{width:6px;height:6px;border-radius:2px;background:#39404E;flex:none}
+.rail .rodape{margin-top:auto;padding:14px 10px 2px;border-top:1px solid #232838;font-size:12px}
+.rail .rodape b{color:#fff;display:block;font-size:13px}
+.rail .rodape button{background:none;border:0;color:#6C7788;font-size:12px;cursor:pointer;padding:6px 0 0}
+.rail .rodape button:hover{color:#fff}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topo{background:var(--carta);border-bottom:1px solid var(--linha);padding:16px 26px 0}
+.topo h1{font-family:var(--dsp);font-size:24px;font-weight:600}
+.topo .sub{color:var(--grafite);font-size:13px;margin-top:2px}
+.topo .linha1{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* barramento: a faixa de estado da plataforma */
+.barra{display:flex;align-items:center;gap:0;margin-top:14px;overflow-x:auto}
+.barra .cel{padding:8px 18px 10px;border-left:1px solid var(--linha2);white-space:nowrap}
+.barra .cel:first-child{padding-left:0;border-left:0}
+.barra .cel small{display:block;font-family:var(--num);font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--grafite);margin-bottom:3px}
+.barra .cel b{font-family:var(--num);font-size:14px;font-weight:600}
+.sinal{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.sinal.on{background:var(--verde);box-shadow:0 0 0 3px var(--verde-fraco)}
+.sinal.off{background:#B9C0CC;box-shadow:0 0 0 3px var(--linha2)}
+.sinal.err{background:var(--vermelho);box-shadow:0 0 0 3px var(--vermelho-fraco)}
+
+.tela{padding:24px 26px 60px;max-width:1320px;width:100%}
+
+/* ---------- blocos ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin-bottom:22px}
+.kpi{background:var(--carta);border:1px solid var(--linha);border-radius:var(--r);padding:14px 16px}
+.kpi small{display:block;font-size:12px;color:var(--grafite);margin-bottom:6px}
+.kpi b{font-family:var(--num);font-size:22px;font-weight:600;letter-spacing:-.02em}
+.kpi .delta{font-size:11px;color:var(--grafite);margin-top:4px;display:block}
+.kpi.destaque{background:var(--casco);border-color:var(--casco)}
+.kpi.destaque small{color:#8C95A6}
+.kpi.destaque b{color:#fff}
+
+.painel{background:var(--carta);border:1px solid var(--linha);border-radius:var(--r);margin-bottom:22px}
+.painel .cab{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--linha2);flex-wrap:wrap}
+.painel .cab h2{font-family:var(--dsp);font-size:15px;font-weight:600}
+.painel .corpo{padding:16px}
+.titulo{font-family:var(--num);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--grafite);margin:26px 0 10px}
+.titulo:first-child{margin-top:0}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-family:var(--num);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--grafite);font-weight:600;padding:10px 14px;border-bottom:1px solid var(--linha);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--linha2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#FAFBFD}
+.rolar{overflow-x:auto}
+.dir{text-align:right}
+
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--num);font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:5px;
+  background:var(--linha2);color:var(--grafite);font-weight:600}
+.tag.ok{background:var(--verde-fraco);color:var(--verde)}
+.tag.mal{background:var(--vermelho-fraco);color:var(--vermelho)}
+.tag.esp{background:var(--ambar-fraco);color:var(--ambar)}
+.tag.azul{background:var(--cobalto-fraco);color:var(--cobalto)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--cobalto);
+  color:#fff;border:1px solid var(--cobalto);border-radius:8px;padding:9px 15px;font-size:14px;
+  font-weight:500;cursor:pointer;transition:filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.claro{background:var(--carta);color:var(--tinta);border-color:var(--linha)}
+.btn.claro:hover{background:var(--papel)}
+.btn.perigo{background:var(--vermelho);border-color:var(--vermelho)}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:7px}
+.btn.wide{width:100%}
+
+.campo{margin-bottom:14px}
+.campo label{display:block;font-size:12px;color:var(--grafite);margin-bottom:5px;font-weight:500}
+.campo input,.campo select,.campo textarea{width:100%;background:var(--carta);border:1px solid var(--linha);
+  border-radius:8px;padding:10px 12px;font-size:14px}
+.campo input:focus,.campo select:focus{border-color:var(--cobalto);outline:none;box-shadow:0 0 0 3px var(--cobalto-fraco)}
+.grade2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.filtros{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.filtros .campo{margin-bottom:0;min-width:150px}
+.busca{flex:1;min-width:200px}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--carta);border:1px solid var(--linha);border-radius:20px;padding:6px 13px;
+  font-size:13px;cursor:pointer}
+.chip.on{background:var(--tinta);border-color:var(--tinta);color:#fff}
+
+/* grafico de barras */
+.graf{display:flex;align-items:flex-end;gap:3px;height:150px;padding-top:8px}
+.graf div{flex:1;background:var(--cobalto);border-radius:3px 3px 0 0;min-height:2px;opacity:.85}
+.graf div:hover{opacity:1}
+.faixa{display:flex;gap:2px;align-items:flex-end;height:26px;width:96px}
+.faixa i{flex:1;background:var(--cobalto);opacity:.7;border-radius:1px;min-height:1px}
+
+.vazio{text-align:center;padding:40px 20px;color:var(--grafite)}
+.vazio b{display:block;font-family:var(--dsp);font-size:17px;color:var(--tinta);margin-bottom:6px}
+.esqueleto{background:linear-gradient(90deg,var(--linha2),var(--papel),var(--linha2));
+  background-size:200% 100%;animation:brilho 1.3s infinite;border-radius:var(--r);height:90px}
+@keyframes brilho{to{background-position:-200% 0}}
+.erro{background:var(--vermelho-fraco);border:1px solid #F3C6CB;color:var(--vermelho);
+  padding:12px 14px;border-radius:8px;font-size:14px;margin-bottom:14px}
+.aviso{background:var(--ambar-fraco);border:1px solid #F0DCBA;color:var(--ambar);
+  padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:14px}
+
+/* modal / gaveta */
+.veu{position:fixed;inset:0;background:rgba(16,20,28,.45);z-index:80;display:flex;
+  align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--carta);border-radius:14px;width:100%;max-width:560px;max-height:88vh;
+  overflow-y:auto;padding:22px}
+.modal h3{font-family:var(--dsp);font-size:19px;font-weight:600;margin-bottom:16px}
+.gaveta{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--carta);
+  z-index:81;overflow-y:auto;padding:22px;border-left:1px solid var(--linha)}
+.acoes{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--tinta);color:#fff;
+  padding:11px 18px;border-radius:9px;z-index:99;font-size:14px;box-shadow:0 8px 24px rgba(16,20,28,.25)}
+
+/* login */
+.entrada{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--casco)}
+.entrada .caixa{background:var(--carta);border-radius:16px;padding:30px;width:100%;max-width:390px}
+.entrada h1{font-family:var(--dsp);font-size:24px;font-weight:600;margin-bottom:4px}
+.entrada p{color:var(--grafite);font-size:14px;margin-bottom:20px}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .rail{position:fixed;bottom:0;top:auto;left:0;right:0;height:auto;flex-direction:row;
+    padding:6px;z-index:60;overflow-x:auto;border-top:1px solid #232838}
+  .rail .marca,.rail .rodape,.nav .grupo{display:none}
+  .nav{flex-direction:row;gap:2px}
+  .nav button{flex-direction:column;gap:4px;font-size:11px;padding:8px 12px;white-space:nowrap}
+  .main{padding-bottom:64px}
+  .topo,.tela{padding-left:16px;padding-right:16px}
+  .grade2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="boot"><div class="spin"></div><p class="mute" style="font-size:13px">Carregando o painel…</p></div>
+
+<script>
+window.__falhou = function(msg){
+  var el = document.getElementById('boot'); if(!el) return;
+  el.innerHTML = '<div class="falha"><h1>O painel não carregou</h1>'
+   + '<p style="color:#626C7E;font-size:14px">Costuma ser bloqueio de rede a um dos serviços externos '
+   + '(cdn.jsdelivr.net ou fonts.googleapis.com). Recarregue a página.</p>'
+   + '<code>' + String(msg).replace(/[<>&]/g,'') + '</code></div>';
+};
+window.addEventListener('error', function(e){
+  if(document.getElementById('boot')) window.__falhou(e.message || 'erro desconhecido');
+});
+setTimeout(function(){
+  if(document.getElementById('boot') && !window.__ok) window.__falhou('Tempo esgotado ao carregar os componentes.');
+}, 12000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script type="module">
+import { html, render, useState, useEffect, useRef, useCallback }
+  from 'https://cdn.jsdelivr.net/npm/htm@3.1.1/preact/standalone.module.js';
+
+/* ================== CONFIG ==================
+   Mesmo Supabase do sistema de vendas: os dois projetos compartilham banco,
+   autenticacao e API. A anon key e publica por natureza — quem barra o acesso
+   e o RLS + a tabela mst_masters, nao o sigilo da chave. Nenhuma credencial
+   de gateway passa por aqui: elas ficam no schema privado mst_seg. */
+const SUPABASE_URL  = 'https://xahdtfrjcogvkmgelsre.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhaGR0ZnJqY29ndmttZ2Vsc3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyMzQ2OTMsImV4cCI6MjEwMjgxMDY5M30.kBZaU8BaEvr4QWqa5-CTnPaq8SUZss7fq-3ZSihjvFw';
+
+/* Onde vive o sistema de vendas do produtor. Usado pelo "Acessar como". */
+const URL_APP = 'https://app.bilhetodigital.com.br';
+
+if(!window.supabase || !window.supabase.createClient){
+  window.__falhou('A biblioteca do Supabase não carregou.');
+  throw new Error('supabase-js ausente');
+}
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* ================== HELPERS ================== */
+const brl = n => Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const nro = n => Number(n||0).toLocaleString('pt-BR');
+const pct = n => Number(n||0).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
+const dataHora = d => d ? new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',
+  year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+const dataCurta = d => d ? new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : '—';
+const iso = d => d.toISOString();
+const inicioDia = d => { const x=new Date(d); x.setHours(0,0,0,0); return x; };
+const hojeMenos = n => inicioDia(new Date(Date.now() - n*86400000));
+
+const PERIODOS = [
+  ['hoje','Hoje',      () => [inicioDia(new Date()), new Date()]],
+  ['7',   '7 dias',    () => [hojeMenos(6), new Date()]],
+  ['30',  '30 dias',   () => [hojeMenos(29), new Date()]],
+  ['mes', 'Este mês',  () => { const d=new Date(); return [new Date(d.getFullYear(),d.getMonth(),1), new Date()]; }],
+  ['ant', 'Mês passado', () => { const d=new Date();
+      return [new Date(d.getFullYear(),d.getMonth()-1,1), new Date(d.getFullYear(),d.getMonth(),0,23,59,59)]; }],
+  ['tudo','Tudo',      () => [new Date(2020,0,1), new Date()]],
+];
+
+const STATUS_TAG = {ativo:'ok', publicado:'ok', pago:'ok', verificado:'ok',
+  bloqueado:'mal', cancelado:'mal', erro:'mal', recusado:'mal',
+  suspenso:'esp', pendente:'esp', rascunho:'esp', pausado:'esp',
+  inativo:'', encerrado:'', expirado:''};
+
+function baixarCSV(nome, linhas){
+  const csv = linhas.map(l => l.map(c => {
+    const v = c==null ? '' : String(c);
+    return /[",;\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+  }).join(';')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = nome; a.click(); URL.revokeObjectURL(a.href);
+}
+
+async function rpc(nome, args){
+  const {data,error} = await db.rpc(nome, args||{});
+  if(error) throw new Error(error.message || 'Falha na chamada '+nome);
+  return data;
+}
+
+/* ================== PECAS ================== */
+function Tag({v}){ if(!v) return null;
+  return html`<span class=${'tag '+(STATUS_TAG[String(v).toLowerCase()]||'')}>${v}</span>`; }
+
+function Kpi({r,v,d,destaque}){
+  return html`<div class=${'kpi'+(destaque?' destaque':'')}>
+    <small>${r}</small><b>${v}</b>${d?html`<span class="delta">${d}</span>`:null}</div>`;
+}
+
+function Vazio({t,s}){ return html`<div class="vazio"><b>${t}</b><span>${s}</span></div>`; }
+
+function Faixa({serie}){
+  const max = Math.max.apply(null,(serie||[]).map(x=>Number(x.valor)).concat([1]));
+  return html`<div class="faixa">${(serie||[]).slice(-14).map((x,i)=>html`
+    <i key=${i} style=${'height:'+Math.max(4,(Number(x.valor)/max)*100)+'%'}></i>`)}</div>`;
+}
+
+function Periodo({valor,onMuda}){
+  return html`<div class="chips">${PERIODOS.map(p=>html`
+    <button key=${p[0]} class=${'chip'+(valor===p[0]?' on':'')} onClick=${()=>onMuda(p[0])}>${p[1]}</button>`)}</div>`;
+}
+const faixaDe = chave => (PERIODOS.find(p=>p[0]===chave)||PERIODOS[2])[2]();
+
+function Modal({titulo,children,onFechar}){
+  return html`<div class="veu" onClick=${e=>{ if(e.target===e.currentTarget) onFechar(); }}>
+    <div class="modal"><h3>${titulo}</h3>${children}</div></div>`;
+}
+
+/* ================== DASHBOARD ================== */
+function Painel({flash}){
+  const [per,setPer] = useState('30');
+  const [d,setD]     = useState(null);
+  const [erro,setEr] = useState('');
+
+  useEffect(()=>{ setD(null); const [de,ate]=faixaDe(per);
+    rpc('mst_dashboard',{p_de:iso(de),p_ate:iso(ate)}).then(setD,e=>setEr(e.message)); },[per]);
+
+  if(erro) return html`<div class="erro">${erro}</div>`;
+  if(!d) return html`<div class="kpis">${[1,2,3,4].map(i=>html`<div class="esqueleto" key=${i}></div>`)}</div>`;
+
+  const v = d.vendas, p = d.produtores, e = d.eventos;
+  const maxs = Math.max.apply(null, d.serie.map(x=>Number(x.valor)).concat([1]));
+
+  return html`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <${Periodo} valor=${per} onMuda=${setPer}/>
+      <button class="btn claro sm" onClick=${()=>baixarCSV('produtores.csv',
+        [['produtor','status','faturamento','taxas','ingressos','pedidos']].concat(
+          d.por_produtor.map(x=>[x.nome,x.status,x.faturamento,x.taxas,x.ingressos,x.pedidos])))}>
+        Exportar CSV</button>
+    </div>
+
+    <div class="kpis">
+      <${Kpi} destaque r="Faturamento no período" v=${brl(v.bruto_periodo)}
+        d=${'Total histórico ' + brl(v.bruto_total)}/>
+      <${Kpi} r="Taxas da plataforma" v=${brl(v.taxas_periodo)} d=${'Acumulado ' + brl(v.taxas_total)}/>
+      <${Kpi} r="Ingressos vendidos" v=${nro(v.ingressos)} d=${'Ticket médio ' + brl(v.ticket_medio)}/>
+      <${Kpi} r="Vendas de hoje" v=${brl(v.hoje)}/>
+    </div>
+
+    <div class="kpis">
+      <${Kpi} r="Produtores" v=${nro(p.total)} d=${p.ativos+' ativos · '+p.bloqueados+' bloqueados'}/>
+      <${Kpi} r="Eventos" v=${nro(e.total)} d=${e.ativos+' ativos'}/>
+      <${Kpi} r="Pedidos pagos" v=${nro(v.pagos)} d=${v.pendentes+' aguardando Pix'}/>
+      <${Kpi} r="Check-ins" v=${nro(d.checkins)} d=${v.cancelados+' pedidos cancelados no período'}/>
+    </div>
+
+    <div class="painel"><div class="cab"><h2>Faturamento por dia</h2>
+      <span class="mute" style="font-size:12px">${dataCurta(d.periodo.de)} — ${dataCurta(d.periodo.ate)}</span></div>
+      <div class="corpo">
+        <div class="graf">${d.serie.map(x=>html`<div key=${x.dia}
+          style=${'height:'+Math.max(2,(Number(x.valor)/maxs)*100)+'%'}
+          title=${dataCurta(x.dia)+': '+brl(x.valor)}></div>`)}</div>
+      </div></div>
+
+    <div class="painel"><div class="cab"><h2>Produtores</h2></div>
+      ${d.por_produtor.length ? html`<div class="rolar"><table>
+        <thead><tr><th>Produtor</th><th>Status</th><th class="dir">Faturamento</th>
+          <th class="dir">Taxas</th><th class="dir">Ingressos</th><th class="dir">Pedidos</th></tr></thead>
+        <tbody>${d.por_produtor.map(x=>html`<tr key=${x.id}>
+          <td><b>${x.nome}</b><div class="mute num" style="font-size:11px">${x.slug}</div></td>
+          <td><${Tag} v=${x.status}/></td>
+          <td class="dir num">${brl(x.faturamento)}</td>
+          <td class="dir num" style="color:var(--cobalto)">${brl(x.taxas)}</td>
+          <td class="dir num">${nro(x.ingressos)}</td>
+          <td class="dir num">${nro(x.pedidos)}</td></tr>`)}</tbody></table></div>`
+        : html`<${Vazio} t="Nenhum produtor ainda" s="Cadastre o primeiro em Produtores."/>`}
+    </div>
+
+    <div class="painel"><div class="cab"><h2>Eventos com mais venda</h2></div>
+      ${d.top_eventos.length ? html`<div class="rolar"><table>
+        <thead><tr><th>Evento</th><th>Produtor</th><th>Data</th>
+          <th class="dir">Ingressos</th><th class="dir">Faturamento</th></tr></thead>
+        <tbody>${d.top_eventos.map(x=>html`<tr key=${x.id}>
+          <td><b>${x.nome}</b></td><td class="mute">${x.produtor||'—'}</td>
+          <td class="mute num">${dataCurta(x.data)}</td>
+          <td class="dir num">${nro(x.ingressos)}</td>
+          <td class="dir num">${brl(x.faturamento)}</td></tr>`)}</tbody></table></div>`
+        : html`<${Vazio} t="Sem eventos no período" s="Assim que houver venda, eles aparecem aqui."/>`}
+    </div>
+
+    <div class="painel"><div class="cab"><h2>Gateways no período</h2></div>
+      <div class="rolar"><table>
+        <thead><tr><th>Gateway</th><th class="dir">Volume</th><th class="dir">Transações</th>
+          <th class="dir">Aprovadas</th><th class="dir">Conversão</th></tr></thead>
+        <tbody>${(d.por_gateway||[]).map(x=>html`<tr key=${x.gateway}>
+          <td><b>${x.gateway==='mercadopago'?'Mercado Pago':'SyncPay'}</b></td>
+          <td class="dir num">${brl(x.volume)}</td><td class="dir num">${nro(x.transacoes)}</td>
+          <td class="dir num">${nro(x.aprovadas)}</td><td class="dir num">${pct(x.conversao)}</td></tr>`)}
+        </tbody></table></div>
+    </div>
+  </div>`;
+}
+
+/* ================== PRODUTORES ================== */
+function FormProdutor({inicial,onFechar,onSalvo,flash}){
+  const [f,setF] = useState(inicial || {nome:'',slug:'',nome_comercial:'',documento:'',
+    email:'',telefone:'',whatsapp:'',logo_url:'',status:'ativo',observacao:''});
+  const [erro,setEr] = useState(''); const [ocupado,setOc] = useState(false);
+  const set = (k,v) => setF(x=>Object.assign({},x,{[k]:v}));
+
+  async function salvar(){
+    if(!f.nome || !f.nome.trim()) return setEr('O nome do produtor é obrigatório.');
+    setOc(true); setEr('');
+    try{ await rpc('mst_produtor_salvar',{p:f}); flash('Produtor salvo'); onSalvo(); onFechar(); }
+    catch(e){ setEr(e.message); } finally{ setOc(false); }
+  }
+
+  return html`<${Modal} titulo=${f.id ? 'Editar produtor' : 'Novo produtor'} onFechar=${onFechar}>
+    ${erro ? html`<div class="erro">${erro}</div>` : null}
+    <div class="grade2">
+      <div class="campo"><label>Nome</label>
+        <input value=${f.nome} onInput=${e=>set('nome',e.target.value)}/></div>
+      <div class="campo"><label>Nome comercial</label>
+        <input value=${f.nome_comercial||''} onInput=${e=>set('nome_comercial',e.target.value)}/></div>
+      <div class="campo"><label>Endereço (slug)</label>
+        <input placeholder="joao" value=${f.slug||''} onInput=${e=>set('slug',e.target.value)}/>
+        <div class="mute" style="font-size:11px;margin-top:4px">${(f.slug||'produtor')}.bilhetodigital.com.br</div></div>
+      <div class="campo"><label>CPF / CNPJ</label>
+        <input value=${f.documento||''} onInput=${e=>set('documento',e.target.value)}/></div>
+      <div class="campo"><label>E-mail</label>
+        <input type="email" value=${f.email||''} onInput=${e=>set('email',e.target.value)}/></div>
+      <div class="campo"><label>Telefone</label>
+        <input value=${f.telefone||''} onInput=${e=>set('telefone',e.target.value)}/></div>
+      <div class="campo"><label>WhatsApp</label>
+        <input placeholder="5598999999999" value=${f.whatsapp||''} onInput=${e=>set('whatsapp',e.target.value)}/></div>
+      <div class="campo"><label>Status</label>
+        <select value=${f.status} onChange=${e=>set('status',e.target.value)}>
+          <option value="ativo">Ativo</option><option value="suspenso">Suspenso</option>
+          <option value="bloqueado">Bloqueado</option><option value="inativo">Inativo</option></select></div>
+    </div>
+    <div class="campo"><label>Logo (URL)</label>
+      <input value=${f.logo_url||''} onInput=${e=>set('logo_url',e.target.value)}/></div>
+    <div class="campo"><label>Observação interna</label>
+      <textarea rows="2" value=${f.observacao||''} onInput=${e=>set('observacao',e.target.value)}></textarea></div>
+    <div class="acoes">
+      <button class="btn claro" onClick=${onFechar}>Cancelar</button>
+      <button class="btn" disabled=${ocupado} onClick=${salvar}>${ocupado?'Salvando…':'Salvar produtor'}</button>
+    </div>
+  <//>`;
+}
+
+function GavetaProdutor({id,onFechar,flash,recarregar}){
+  const [d,setD] = useState(null);
+  useEffect(()=>{ rpc('mst_produtor_detalhe',{p_tenant:id}).then(setD,()=>setD(false)); },[id]);
+
+  async function acessarComo(){
+    const r = await rpc('mst_acessar_como',{p_tenant:id});
+    flash('Acesso registrado na auditoria');
+    window.open(URL_APP + '/?tenant=' + r.slug, '_blank', 'noopener');
+  }
+
+  if(d===false) return html`<div class="gaveta"><div class="erro">Não foi possível carregar este produtor.</div>
+    <button class="btn claro" onClick=${onFechar}>Fechar</button></div>`;
+  if(!d) return html`<div class="gaveta"><div class="esqueleto" style="height:180px"></div></div>`;
+  const t = d.produtor;
+
+  return html`<div class="gaveta">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px">
+      <div><h3 class="dsp" style="font-size:21px">${t.nome}</h3>
+        <div class="mute num" style="font-size:12px">${t.slug}.bilhetodigital.com.br</div></div>
+      <button class="btn claro sm" onClick=${onFechar}>Fechar</button>
+    </div>
+    <div style="margin:12px 0"><${Tag} v=${t.status}/></div>
+
+    <div class="acoes" style="justify-content:flex-start;margin-bottom:20px">
+      <button class="btn sm" onClick=${acessarComo}>Acessar como produtor</button>
+      ${t.status==='ativo'
+        ? html`<button class="btn claro sm" onClick=${async()=>{
+            await rpc('mst_produtor_status',{p_tenant:id,p_status:'bloqueado'});
+            flash('Produtor bloqueado'); recarregar(); onFechar(); }}>Bloquear</button>`
+        : html`<button class="btn claro sm" onClick=${async()=>{
+            await rpc('mst_produtor_status',{p_tenant:id,p_status:'ativo'});
+            flash('Produtor reativado'); recarregar(); onFechar(); }}>Reativar</button>`}
+    </div>
+
+    <div class="titulo">Cadastro</div>
+    <table><tbody>
+      ${[['Documento',t.documento],['E-mail',t.email],['Telefone',t.telefone],
+         ['WhatsApp',t.whatsapp],['Cadastrado em',dataHora(t.criado_em)],
+         ['Último acesso',t.ultimo_acesso?dataHora(t.ultimo_acesso):'nunca']].map(l=>html`
+        <tr key=${l[0]}><td class="mute" style="width:42%">${l[0]}</td>
+          <td class="num">${l[1]||'—'}</td></tr>`)}
+    </tbody></table>
+
+    <div class="titulo">Taxa aplicada às vendas</div>
+    ${d.taxa && d.taxa.id ? html`<div class="painel"><div class="corpo num">
+        ${d.taxa.modelo==='percentual' ? pct(d.taxa.percentual)
+          : d.taxa.modelo==='fixo' ? brl(d.taxa.valor_fixo)+' por ingresso'
+          : brl(d.taxa.valor_fixo)+' por ingresso + '+pct(d.taxa.percentual)}
+        <div class="mute" style="font-size:12px;margin-top:4px">
+          ${d.taxa.tenant_id ? 'Taxa específica deste produtor' : 'Taxa global da plataforma'}</div>
+      </div></div>`
+      : html`<div class="aviso">Nenhuma taxa configurada. As vendas estão sendo registradas sem taxa.</div>`}
+
+    <div class="titulo">Eventos (${d.eventos.length})</div>
+    ${d.eventos.length ? html`<div class="rolar"><table>
+      <thead><tr><th>Evento</th><th>Status</th><th class="dir">Vendidos</th></tr></thead>
+      <tbody>${d.eventos.map(e=>html`<tr key=${e.id}><td>${e.nome}</td>
+        <td><${Tag} v=${e.status}/></td>
+        <td class="dir num">${nro(e.vendidos)}${e.total?' / '+nro(e.total):''}</td></tr>`)}</tbody>
+      </table></div>` : html`<p class="mute" style="font-size:14px">Nenhum evento criado.</p>`}
+
+    <div class="titulo">Equipe com acesso</div>
+    ${d.membros.length ? html`<table><tbody>${d.membros.map(m=>html`<tr key=${m.id}>
+        <td>${m.email||'—'}</td><td class="dir"><${Tag} v=${m.papel}/></td></tr>`)}</tbody></table>`
+      : html`<p class="mute" style="font-size:14px">Ninguém vinculado. Faça isso em Acessos.</p>`}
+
+    <div class="titulo">Últimos pedidos</div>
+    ${d.ultimos_pedidos.length ? html`<div class="rolar"><table>
+      <thead><tr><th>Código</th><th>Status</th><th class="dir">Valor</th><th>Quando</th></tr></thead>
+      <tbody>${d.ultimos_pedidos.map(p=>html`<tr key=${p.codigo}>
+        <td class="num">${p.codigo}</td><td><${Tag} v=${p.status}/></td>
+        <td class="dir num">${brl(p.valor)}</td>
+        <td class="mute num" style="font-size:12px">${dataHora(p.criado_em)}</td></tr>`)}</tbody>
+      </table></div>` : html`<p class="mute" style="font-size:14px">Nenhum pedido ainda.</p>`}
+  </div>`;
+}
+
+function Produtores({flash}){
+  const [lista,setL] = useState(null);
+  const [busca,setB] = useState('');
+  const [status,setS] = useState('');
+  const [form,setForm] = useState(null);
+  const [aberto,setAb] = useState(null);
+  const [erro,setEr] = useState('');
+
+  const carregar = useCallback(()=>{ setEr('');
+    rpc('mst_produtores',{p_busca:busca,p_status:status}).then(setL,e=>setEr(e.message)); },[busca,status]);
+  useEffect(()=>{ const t=setTimeout(carregar,220); return ()=>clearTimeout(t); },[carregar]);
+
+  return html`<div>
+    <div class="filtros">
+      <div class="campo busca"><label>Buscar</label>
+        <input placeholder="nome, slug, e-mail ou documento" value=${busca}
+          onInput=${e=>setB(e.target.value)}/></div>
+      <div class="campo"><label>Status</label>
+        <select value=${status} onChange=${e=>setS(e.target.value)}>
+          <option value="">Todos</option><option value="ativo">Ativos</option>
+          <option value="suspenso">Suspensos</option><option value="bloqueado">Bloqueados</option>
+          <option value="inativo">Inativos</option></select></div>
+      <button class="btn" onClick=${()=>setForm({})}>Novo produtor</button>
+    </div>
+
+    ${erro ? html`<div class="erro">${erro}</div>` : null}
+    ${!lista ? html`<div class="esqueleto" style="height:220px"></div>`
+      : !lista.length ? html`<div class="painel"><${Vazio} t="Nenhum produtor encontrado"
+          s="Cadastre o primeiro produtor para começar a operar a plataforma."/></div>`
+      : html`<div class="painel"><div class="rolar"><table>
+        <thead><tr><th>Produtor</th><th>Status</th><th>Gateway</th><th class="dir">Eventos</th>
+          <th class="dir">Ingressos</th><th class="dir">Faturamento</th><th class="dir">Taxas</th><th></th></tr></thead>
+        <tbody>${lista.map(t=>html`<tr key=${t.id}>
+          <td><b>${t.nome}</b><div class="mute num" style="font-size:11px">${t.slug}</div></td>
+          <td><${Tag} v=${t.status}/></td>
+          <td>${(t.gateways||[]).length
+              ? t.gateways.map(g=>html`<span key=${g.gateway} class="tag azul" style="margin-right:4px">
+                  ${g.gateway==='mercadopago'?'MP':'Sync'}</span>`)
+              : html`<span class="mute" style="font-size:12px">—</span>`}</td>
+          <td class="dir num">${nro(t.eventos)}</td>
+          <td class="dir num">${nro(t.ingressos)}</td>
+          <td class="dir num">${brl(t.faturamento)}</td>
+          <td class="dir num" style="color:var(--cobalto)">${brl(t.taxas)}</td>
+          <td class="dir"><button class="btn claro sm" onClick=${()=>setAb(t.id)}>Abrir</button>
+            <button class="btn claro sm" style="margin-left:6px" onClick=${()=>setForm(t)}>Editar</button></td>
+        </tr>`)}</tbody></table></div></div>`}
+
+    ${form ? html`<${FormProdutor} inicial=${form.id?form:null} flash=${flash}
+      onFechar=${()=>setForm(null)} onSalvo=${carregar}/>` : null}
+    ${aberto ? html`<${GavetaProdutor} id=${aberto} flash=${flash} recarregar=${carregar}
+      onFechar=${()=>setAb(null)}/>` : null}
+  </div>`;
+}
+
+/* ================== EVENTOS ================== */
+function Eventos({tenants,flash}){
+  const [l,setL] = useState(null);
+  const [tenant,setT] = useState('');
+  const [status,setS] = useState('');
+  const [busca,setB] = useState('');
+
+  const carregar = useCallback(()=>rpc('mst_eventos',
+    {p_tenant:tenant||null,p_status:status,p_busca:busca}).then(setL,()=>setL([])),[tenant,status,busca]);
+  useEffect(()=>{ const t=setTimeout(carregar,220); return ()=>clearTimeout(t); },[carregar]);
+
+  async function mudar(e,novo){
+    if(!confirm('Mudar "'+e.nome+'" para '+novo+'?')) return;
+    await rpc('mst_evento_status',{p_evento:e.id,p_status:novo});
+    flash('Evento atualizado'); carregar();
+  }
+
+  return html`<div>
+    <div class="filtros">
+      <div class="campo busca"><label>Buscar</label>
+        <input placeholder="nome do evento" value=${busca} onInput=${e=>setB(e.target.value)}/></div>
+      <div class="campo"><label>Produtor</label>
+        <select value=${tenant} onChange=${e=>setT(e.target.value)}>
+          <option value="">Todos</option>
+          ${tenants.map(t=>html`<option key=${t.id} value=${t.id}>${t.nome}</option>`)}</select></div>
+      <div class="campo"><label>Status</label>
+        <select value=${status} onChange=${e=>setS(e.target.value)}>
+          <option value="">Todos</option><option value="ativo">Ativo</option>
+          <option value="rascunho">Rascunho</option><option value="pausado">Pausado</option>
+          <option value="encerrado">Encerrado</option><option value="cancelado">Cancelado</option></select></div>
+    </div>
+
+    ${!l ? html`<div class="esqueleto" style="height:200px"></div>`
+      : !l.length ? html`<div class="painel"><${Vazio} t="Nenhum evento"
+          s="Os eventos são criados pelo produtor no sistema de vendas."/></div>`
+      : html`<div class="painel"><div class="rolar"><table>
+        <thead><tr><th>Evento</th><th>Produtor</th><th>Data</th><th>Status</th>
+          <th class="dir">Vendidos</th><th class="dir">Check-ins</th><th class="dir">Faturamento</th><th></th></tr></thead>
+        <tbody>${l.map(e=>html`<tr key=${e.id}>
+          <td><b>${e.nome}</b>${e.local?html`<div class="mute" style="font-size:11px">${e.local}</div>`:null}</td>
+          <td class="mute">${e.produtor||'—'}</td>
+          <td class="num mute">${dataCurta(e.data)}</td>
+          <td><${Tag} v=${e.status}/></td>
+          <td class="dir num">${nro(e.vendidos)}${e.total?' / '+nro(e.total):''}</td>
+          <td class="dir num">${nro(e.checkins)}</td>
+          <td class="dir num">${brl(e.faturamento)}</td>
+          <td class="dir">
+            ${e.status==='ativo'
+              ? html`<button class="btn claro sm" onClick=${()=>mudar(e,'pausado')}>Pausar</button>`
+              : html`<button class="btn claro sm" onClick=${()=>mudar(e,'ativo')}>Ativar</button>`}
+            <button class="btn claro sm" style="margin-left:6px" onClick=${()=>mudar(e,'encerrado')}>Encerrar</button>
+          </td></tr>`)}</tbody></table></div></div>`}
+  </div>`;
+}
+
+/* ================== FINANCEIRO ================== */
+function Financeiro({tenants}){
+  const [per,setPer] = useState('mes');
+  const [tenant,setT] = useState('');
+  const [gw,setGw] = useState('');
+  const [status,setS] = useState('');
+  const [pag,setPag] = useState(0);
+  const [d,setD] = useState(null);
+  const LIM = 100;
+
+  useEffect(()=>{ setD(null); const [de,ate]=faixaDe(per);
+    rpc('mst_financeiro',{p_de:iso(de),p_ate:iso(ate),p_tenant:tenant||null,
+      p_gateway:gw,p_status:status,p_limite:LIM,p_offset:pag*LIM}).then(setD,()=>setD(false));
+  },[per,tenant,gw,status,pag]);
+  useEffect(()=>setPag(0),[per,tenant,gw,status]);
+
+  return html`<div>
+    <div style="margin-bottom:14px"><${Periodo} valor=${per} onMuda=${setPer}/></div>
+    <div class="filtros">
+      <div class="campo"><label>Produtor</label>
+        <select value=${tenant} onChange=${e=>setT(e.target.value)}>
+          <option value="">Todos</option>
+          ${tenants.map(t=>html`<option key=${t.id} value=${t.id}>${t.nome}</option>`)}</select></div>
+      <div class="campo"><label>Gateway</label>
+        <select value=${gw} onChange=${e=>setGw(e.target.value)}>
+          <option value="">Todos</option><option value="syncpay">SyncPay</option>
+          <option value="mercadopago">Mercado Pago</option></select></div>
+      <div class="campo"><label>Status</label>
+        <select value=${status} onChange=${e=>setS(e.target.value)}>
+          <option value="">Todos</option><option value="pago">Pago</option>
+          <option value="pendente">Pendente</option><option value="cancelado">Cancelado</option>
+          <option value="expirado">Expirado</option></select></div>
+      ${d && d.transacoes ? html`<button class="btn claro" onClick=${()=>baixarCSV('transacoes.csv',
+        [['codigo','produtor','evento','qtd','valor','taxa','liquido','status','forma','gateway','data']]
+          .concat(d.transacoes.map(t=>[t.codigo,t.produtor,t.evento,t.quantidade,t.valor,t.taxa,
+            t.liquido,t.status,t.forma,t.gateway,t.criado_em])))}>Exportar CSV</button>` : null}
+    </div>
+
+    ${!d ? html`<div class="esqueleto" style="height:200px"></div>` : html`<div>
+      <div class="kpis">
+        <${Kpi} destaque r="Volume bruto" v=${brl(d.resumo.bruto)}/>
+        <${Kpi} r="Taxas da plataforma" v=${brl(d.resumo.taxas)}/>
+        <${Kpi} r="Repasse aos produtores" v=${brl(d.resumo.liquido)}/>
+        <${Kpi} r="Ingressos" v=${nro(d.resumo.ingressos)}/>
+      </div>
+      <div class="kpis">
+        <${Kpi} r="Aprovados" v=${nro(d.resumo.aprovados)}/>
+        <${Kpi} r="Pendentes" v=${nro(d.resumo.pendentes)}/>
+        <${Kpi} r="Cancelados" v=${nro(d.resumo.cancelados)}/>
+        <${Kpi} r="Linhas no filtro" v=${nro(d.resumo.total_linhas)}/>
+      </div>
+
+      <div class="painel"><div class="cab"><h2>Transações</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn claro sm" disabled=${pag===0} onClick=${()=>setPag(p=>p-1)}>Anterior</button>
+          <span class="mute num" style="font-size:12px">página ${pag+1}</span>
+          <button class="btn claro sm" disabled=${d.transacoes.length<LIM}
+            onClick=${()=>setPag(p=>p+1)}>Próxima</button></div></div>
+        ${d.transacoes.length ? html`<div class="rolar"><table>
+          <thead><tr><th>Código</th><th>Produtor</th><th>Evento</th><th>Status</th><th>Gateway</th>
+            <th class="dir">Qtd</th><th class="dir">Valor</th><th class="dir">Taxa</th>
+            <th class="dir">Líquido</th><th>Quando</th></tr></thead>
+          <tbody>${d.transacoes.map(t=>html`<tr key=${t.id}>
+            <td class="num">${t.codigo}</td>
+            <td>${t.produtor||'—'}</td>
+            <td class="mute">${t.evento||'—'}</td>
+            <td><${Tag} v=${t.status}/></td>
+            <td class="mute" style="font-size:12px">${t.gateway==='mercadopago'?'Mercado Pago':'SyncPay'}</td>
+            <td class="dir num">${t.quantidade}</td>
+            <td class="dir num">${brl(t.valor)}</td>
+            <td class="dir num" style="color:var(--cobalto)">${brl(t.taxa)}</td>
+            <td class="dir num">${brl(t.liquido)}</td>
+            <td class="mute num" style="font-size:12px">${dataHora(t.criado_em)}</td></tr>`)}</tbody>
+          </table></div>` : html`<${Vazio} t="Sem transações no filtro" s="Ajuste o período ou os filtros."/>`}
+      </div></div>`}
+  </div>`;
+}
+
+/* ================== TAXAS ================== */
+function Taxas({tenants,flash}){
+  const [l,setL] = useState(null);
+  const [f,setF] = useState({tenant:'',modelo:'fixo',fixo:'0,25',percentual:'0'});
+  const [erro,setEr] = useState(''); const [ocupado,setOc] = useState(false);
+  const carregar = useCallback(()=>rpc('mst_taxas_listar').then(setL,()=>setL([])),[]);
+  useEffect(()=>{ carregar(); },[carregar]);
+
+  async function salvar(){
+    setOc(true); setEr('');
+    try{
+      await rpc('mst_taxa_salvar',{p_tenant:f.tenant||null,p_modelo:f.modelo,
+        p_fixo:Number(String(f.fixo).replace(',','.'))||0,
+        p_percentual:Number(String(f.percentual).replace(',','.'))||0});
+      flash('Nova taxa em vigor'); carregar();
+    }catch(e){ setEr(e.message); } finally{ setOc(false); }
+  }
+
+  return html`<div>
+    <div class="aviso">Taxa nova vale só para vendas novas. Cada pedido guarda a taxa que estava
+      valendo no momento da compra — mexer aqui nunca recalcula o passado.</div>
+
+    <div class="painel"><div class="cab"><h2>Definir taxa</h2></div><div class="corpo">
+      ${erro ? html`<div class="erro">${erro}</div>` : null}
+      <div class="grade2">
+        <div class="campo"><label>Vale para</label>
+          <select value=${f.tenant} onChange=${e=>setF(x=>({...x,tenant:e.target.value}))}>
+            <option value="">Toda a plataforma</option>
+            ${tenants.map(t=>html`<option key=${t.id} value=${t.id}>Só ${t.nome}</option>`)}</select></div>
+        <div class="campo"><label>Modelo</label>
+          <select value=${f.modelo} onChange=${e=>setF(x=>({...x,modelo:e.target.value}))}>
+            <option value="fixo">Valor fixo por ingresso</option>
+            <option value="percentual">Percentual sobre o pedido</option>
+            <option value="hibrido">Fixo + percentual</option></select></div>
+        ${f.modelo!=='percentual' ? html`<div class="campo"><label>Valor por ingresso (R$)</label>
+          <input class="num" value=${f.fixo} onInput=${e=>setF(x=>({...x,fixo:e.target.value}))}/></div>` : null}
+        ${f.modelo!=='fixo' ? html`<div class="campo"><label>Percentual (%)</label>
+          <input class="num" value=${f.percentual} onInput=${e=>setF(x=>({...x,percentual:e.target.value}))}/></div>` : null}
+      </div>
+      <button class="btn" disabled=${ocupado} onClick=${salvar}>${ocupado?'Salvando…':'Colocar em vigor'}</button>
+    </div></div>
+
+    <div class="painel"><div class="cab"><h2>Histórico de taxas</h2></div>
+      ${!l ? html`<div class="corpo"><div class="esqueleto" style="height:60px"></div></div>`
+        : !l.length ? html`<${Vazio} t="Nenhuma taxa definida" s="Defina a taxa da plataforma acima."/>`
+        : html`<div class="rolar"><table>
+          <thead><tr><th>Vale para</th><th>Modelo</th><th class="dir">Fixo</th>
+            <th class="dir">Percentual</th><th>Em vigor desde</th><th>Situação</th></tr></thead>
+          <tbody>${l.map(t=>html`<tr key=${t.id}>
+            <td><b>${t.produtor}</b></td><td class="mute">${t.modelo}</td>
+            <td class="dir num">${brl(t.valor_fixo)}</td><td class="dir num">${pct(t.percentual)}</td>
+            <td class="mute num" style="font-size:12px">${dataHora(t.vigente_desde)}</td>
+            <td><${Tag} v=${t.ativo?'ativo':'inativo'}/></td></tr>`)}</tbody></table></div>`}
+    </div>
+  </div>`;
+}
+
+/* ================== GATEWAYS ================== */
+function Gateways({tenants,flash}){
+  const [d,setD] = useState(null);
+  const [form,setForm] = useState(null);
+  const carregar = useCallback(()=>rpc('mst_gateways_resumo').then(setD,()=>setD(false)),[]);
+  useEffect(()=>{ carregar(); },[carregar]);
+
+  return html`<div>
+    <div class="aviso">A plataforma trabalha com dois gateways: SyncPay e Mercado Pago.
+      As chaves ficam cifradas num schema que a API não expõe — nem este painel consegue lê-las de volta.</div>
+
+    ${!d ? html`<div class="esqueleto" style="height:160px"></div>` : html`<div>
+      <div class="kpis">${d.gateways.map(g=>html`<div class="kpi" key=${g.gateway}>
+        <small><span class=${'sinal '+(g.erros>0?'err':(g.produtores>0?'on':'off'))}></span>
+          ${g.gateway==='mercadopago'?'Mercado Pago':'SyncPay'}</small>
+        <b>${brl(g.volume)}</b>
+        <span class="delta">${g.produtores} produtor(es) · ${nro(g.transacoes)} transações ·
+          ${pct(g.transacoes ? 100*g.aprovadas/g.transacoes : 0)} aprovadas</span></div>`)}
+      </div>
+
+      <div class="painel"><div class="cab"><h2>Ligações por produtor</h2>
+        <button class="btn sm" onClick=${()=>setForm({tenant:'',gateway:'syncpay',status:'ativo',
+          apelido:'',credenciais:''})}>Configurar gateway</button></div>
+        ${d.ligacoes.length ? html`<div class="rolar"><table>
+          <thead><tr><th>Produtor</th><th>Gateway</th><th>Status</th><th>Credencial</th>
+            <th>Atualizado</th><th></th></tr></thead>
+          <tbody>${d.ligacoes.map(x=>html`<tr key=${x.id}>
+            <td><b>${x.produtor}</b>${x.apelido?html`<div class="mute" style="font-size:11px">${x.apelido}</div>`:null}</td>
+            <td>${x.gateway==='mercadopago'?'Mercado Pago':'SyncPay'}</td>
+            <td><${Tag} v=${x.status}/></td>
+            <td>${x.tem_credencial ? html`<span class="tag ok">guardada</span>`
+                                   : html`<span class="tag esp">faltando</span>`}</td>
+            <td class="mute num" style="font-size:12px">${dataHora(x.atualizado_em)}</td>
+            <td class="dir"><button class="btn claro sm" onClick=${()=>setForm({tenant:x.tenant_id,
+              gateway:x.gateway,status:x.status,apelido:x.apelido||'',credenciais:''})}>Editar</button></td>
+          </tr>`)}</tbody></table></div>`
+          : html`<${Vazio} t="Nenhum gateway ligado"
+              s="Configure o gateway de cada produtor para as vendas começarem."/>`}
+      </div></div>`}
+
+    ${form ? html`<${FormGateway} f=${form} tenants=${tenants} flash=${flash}
+      onFechar=${()=>setForm(null)} onSalvo=${carregar}/>` : null}
+  </div>`;
+}
+
+function FormGateway({f:inicial,tenants,onFechar,onSalvo,flash}){
+  const [f,setF] = useState(inicial);
+  const [erro,setEr] = useState(''); const [ocupado,setOc] = useState(false);
+  const set = (k,v)=>setF(x=>({...x,[k]:v}));
+
+  async function salvar(){
+    if(!f.tenant) return setEr('Escolha o produtor.');
+    let cred = null;
+    if(f.credenciais && f.credenciais.trim()){
+      try{ cred = JSON.parse(f.credenciais); }
+      catch(e){ return setEr('As credenciais precisam estar em JSON válido. Ex.: {"client_id":"...","client_secret":"..."}'); }
+    }
+    setOc(true); setEr('');
+    try{
+      await rpc('mst_gateway_salvar',{p_tenant:f.tenant,p_gateway:f.gateway,p_status:f.status,
+        p_apelido:f.apelido||null,p_credenciais:cred});
+      flash('Gateway configurado'); onSalvo(); onFechar();
+    }catch(e){ setEr(e.message); } finally{ setOc(false); }
+  }
+
+  return html`<${Modal} titulo="Configurar gateway" onFechar=${onFechar}>
+    ${erro ? html`<div class="erro">${erro}</div>` : null}
+    <div class="grade2">
+      <div class="campo"><label>Produtor</label>
+        <select value=${f.tenant} onChange=${e=>set('tenant',e.target.value)}>
+          <option value="">Escolha…</option>
+          ${tenants.map(t=>html`<option key=${t.id} value=${t.id}>${t.nome}</option>`)}</select></div>
+      <div class="campo"><label>Gateway</label>
+        <select value=${f.gateway} onChange=${e=>set('gateway',e.target.value)}>
+          <option value="syncpay">SyncPay</option>
+          <option value="mercadopago">Mercado Pago</option></select></div>
+      <div class="campo"><label>Status</label>
+        <select value=${f.status} onChange=${e=>set('status',e.target.value)}>
+          <option value="ativo">Ativo</option><option value="inativo">Inativo</option>
+          <option value="erro">Com erro</option></select></div>
+      <div class="campo"><label>Apelido da conta</label>
+        <input value=${f.apelido} onInput=${e=>set('apelido',e.target.value)}/></div>
+    </div>
+    <div class="campo"><label>Credenciais (JSON)</label>
+      <textarea rows="4" class="num" style="font-size:12px"
+        placeholder='{"client_id":"...","client_secret":"..."}'
+        value=${f.credenciais} onInput=${e=>set('credenciais',e.target.value)}></textarea>
+      <div class="mute" style="font-size:11px;margin-top:5px">
+        Deixe em branco para manter a credencial atual. O que você digitar é cifrado no banco
+        e não volta para a tela — nem para este painel.</div></div>
+    <div class="acoes">
+      <button class="btn claro" onClick=${onFechar}>Cancelar</button>
+      <button class="btn" disabled=${ocupado} onClick=${salvar}>${ocupado?'Salvando…':'Salvar'}</button>
+    </div>
+  <//>`;
+}
+
+/* ================== DOMÍNIOS ================== */
+function Dominios({tenants,flash}){
+  const [l,setL] = useState(null);
+  const [f,setF] = useState({tenant:'',dominio:'',tipo:'SUBDOMAIN'});
+  const [erro,setEr] = useState('');
+  const carregar = useCallback(()=>rpc('mst_dominios_listar').then(setL,()=>setL([])),[]);
+  useEffect(()=>{ carregar(); },[carregar]);
+
+  async function adicionar(){
+    if(!f.dominio.trim()) return setEr('Digite o domínio.');
+    try{ await rpc('mst_dominio_salvar',{p_tenant:f.tenant||null,p_dominio:f.dominio,p_tipo:f.tipo});
+      setF({tenant:'',dominio:'',tipo:'SUBDOMAIN'}); setEr(''); flash('Domínio cadastrado'); carregar();
+    }catch(e){ setEr(e.message); }
+  }
+
+  return html`<div>
+    <div class="painel"><div class="cab"><h2>Como o DNS fica</h2></div><div class="corpo">
+      <table><tbody>
+        <tr><td class="num">admin.bilhetodigital.com.br</td><td class="mute">este painel</td></tr>
+        <tr><td class="num">app.bilhetodigital.com.br</td><td class="mute">sistema de vendas do produtor</td></tr>
+        <tr><td class="num">api.bilhetodigital.com.br</td><td class="mute">API e webhooks</td></tr>
+        <tr><td class="num">*.bilhetodigital.com.br</td><td class="mute">
+          curinga: cria o ambiente de cada produtor sem registro novo de DNS</td></tr>
+      </tbody></table></div></div>
+
+    <div class="painel"><div class="cab"><h2>Domínios cadastrados</h2></div><div class="corpo">
+      ${erro ? html`<div class="erro">${erro}</div>` : null}
+      <div class="filtros">
+        <div class="campo busca"><label>Domínio</label>
+          <input placeholder="joao.bilhetodigital.com.br" value=${f.dominio}
+            onInput=${e=>setF(x=>({...x,dominio:e.target.value}))}/></div>
+        <div class="campo"><label>Produtor</label>
+          <select value=${f.tenant} onChange=${e=>setF(x=>({...x,tenant:e.target.value}))}>
+            <option value="">Sem dono</option>
+            ${tenants.map(t=>html`<option key=${t.id} value=${t.id}>${t.nome}</option>`)}</select></div>
+        <div class="campo"><label>Tipo</label>
+          <select value=${f.tipo} onChange=${e=>setF(x=>({...x,tipo:e.target.value}))}>
+            <option value="SUBDOMAIN">Subdomínio</option>
+            <option value="CUSTOM_DOMAIN">Domínio próprio</option></select></div>
+        <button class="btn" onClick=${adicionar}>Adicionar</button>
+      </div>
+
+      ${!l ? html`<div class="esqueleto" style="height:80px"></div>`
+        : !l.length ? html`<${Vazio} t="Nenhum domínio" s="Cadastre o subdomínio de cada produtor."/>`
+        : html`<div class="rolar"><table>
+          <thead><tr><th>Domínio</th><th>Produtor</th><th>Tipo</th><th>Status</th>
+            <th>Verificação</th><th></th></tr></thead>
+          <tbody>${l.map(d=>html`<tr key=${d.id}>
+            <td class="num">${d.dominio}</td><td>${d.produtor||'—'}</td>
+            <td class="mute" style="font-size:12px">${d.tipo==='CUSTOM_DOMAIN'?'próprio':'subdomínio'}</td>
+            <td><${Tag} v=${d.status}/></td>
+            <td class="num mute" style="font-size:11px">TXT bilheto-verify=${d.token}</td>
+            <td class="dir">
+              ${d.status!=='verificado'
+                ? html`<button class="btn claro sm" onClick=${async()=>{
+                    await rpc('mst_dominio_status',{p_id:d.id,p_status:'verificado'});
+                    flash('Domínio verificado'); carregar(); }}>Marcar verificado</button>` : null}
+              <button class="btn claro sm" style="margin-left:6px" onClick=${async()=>{
+                if(!confirm('Remover '+d.dominio+'?')) return;
+                await rpc('mst_dominio_remover',{p_id:d.id}); flash('Domínio removido'); carregar();
+              }}>Remover</button></td></tr>`)}</tbody></table></div>`}
+    </div></div>
+  </div>`;
+}
+
+/* ================== AUDITORIA ================== */
+function Auditoria({tenants}){
+  const [l,setL] = useState(null);
+  const [busca,setB] = useState(''); const [tenant,setT] = useState(''); const [pag,setPag] = useState(0);
+  const LIM = 80;
+  const carregar = useCallback(()=>rpc('mst_auditoria_listar',
+    {p_busca:busca,p_tenant:tenant||null,p_limite:LIM,p_offset:pag*LIM}).then(setL,()=>setL([])),[busca,tenant,pag]);
+  useEffect(()=>{ const t=setTimeout(carregar,220); return ()=>clearTimeout(t); },[carregar]);
+
+  return html`<div>
+    <div class="filtros">
+      <div class="campo busca"><label>Buscar</label>
+        <input placeholder="quem fez ou qual ação" value=${busca} onInput=${e=>setB(e.target.value)}/></div>
+      <div class="campo"><label>Produtor</label>
+        <select value=${tenant} onChange=${e=>setT(e.target.value)}>
+          <option value="">Todos</option>
+          ${tenants.map(t=>html`<option key=${t.id} value=${t.id}>${t.nome}</option>`)}</select></div>
+    </div>
+    <div class="painel"><div class="cab"><h2>Registro de auditoria</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn claro sm" disabled=${pag===0} onClick=${()=>setPag(p=>p-1)}>Anterior</button>
+        <span class="mute num" style="font-size:12px">página ${pag+1}</span>
+        <button class="btn claro sm" disabled=${!l||l.length<LIM} onClick=${()=>setPag(p=>p+1)}>Próxima</button>
+      </div></div>
+      ${!l ? html`<div class="corpo"><div class="esqueleto" style="height:80px"></div></div>`
+        : !l.length ? html`<${Vazio} t="Nada registrado ainda"
+            s="Toda ação feita neste painel entra aqui automaticamente."/>`
+        : html`<div class="rolar"><table>
+          <thead><tr><th>Quando</th><th>Quem</th><th>Ação</th><th>Recurso</th><th>Produtor</th></tr></thead>
+          <tbody>${l.map(a=>html`<tr key=${a.id}>
+            <td class="num mute" style="font-size:12px">${dataHora(a.criado_em)}</td>
+            <td>${a.ator||'—'}</td>
+            <td><span class="tag azul">${a.acao}</span></td>
+            <td class="mute num" style="font-size:12px">${a.recurso||''} ${(a.recurso_id||'').slice(0,8)}</td>
+            <td class="mute">${a.produtor||'—'}</td></tr>`)}</tbody></table></div>`}
+    </div>
+  </div>`;
+}
+
+/* ================== ACESSOS ================== */
+function Acessos({tenants,flash}){
+  const [d,setD] = useState(null);
+  const [f,setF] = useState({tenant:'',email:'',papel:'admin'});
+  const [em,setEm] = useState(''); const [erro,setEr] = useState('');
+  const carregar = useCallback(()=>rpc('mst_usuarios').then(setD,()=>setD(false)),[]);
+  useEffect(()=>{ carregar(); },[carregar]);
+
+  async function vincular(){
+    if(!f.tenant || !f.email) return setEr('Escolha o produtor e digite o e-mail.');
+    try{ await rpc('mst_membro_salvar',{p_tenant:f.tenant,p_email:f.email,p_papel:f.papel});
+      setF({tenant:'',email:'',papel:'admin'}); setEr(''); flash('Acesso liberado'); carregar();
+    }catch(e){ setEr(e.message); }
+  }
+  async function darMaster(){
+    if(!em) return setEr('Digite o e-mail.');
+    if(!confirm('Dar acesso master total para '+em+'?')) return;
+    try{ await rpc('mst_master_conceder',{p_email:em}); setEm(''); setEr('');
+      flash('Master concedido'); carregar(); }catch(e){ setEr(e.message); }
+  }
+
+  return html`<div>
+    ${erro ? html`<div class="erro">${erro}</div>` : null}
+    <div class="aviso">Quem entra aqui precisa já ter conta criada no Supabase Auth.
+      Você libera o acesso de uma conta que existe — não cria senha por este painel.</div>
+
+    <div class="painel"><div class="cab"><h2>Masters da plataforma</h2></div><div class="corpo">
+      <div class="filtros">
+        <div class="campo busca"><label>E-mail de uma conta existente</label>
+          <input type="email" value=${em} onInput=${e=>setEm(e.target.value)}/></div>
+        <button class="btn" onClick=${darMaster}>Conceder master</button>
+      </div>
+      ${d && d.masters ? html`<table><tbody>${d.masters.map(m=>html`<tr key=${m.user_id}>
+        <td><b>${m.email||m.user_id}</b><div class="mute" style="font-size:11px">desde ${dataHora(m.criado_em)}</div></td>
+        <td class="dir"><button class="btn claro sm" onClick=${async()=>{
+          if(!confirm('Remover o acesso master de '+m.email+'?')) return;
+          try{ await rpc('mst_master_revogar',{p_user:m.user_id}); flash('Master removido'); carregar(); }
+          catch(e){ setEr(e.message); } }}>Remover</button></td></tr>`)}</tbody></table>` : null}
+    </div></div>
+
+    <div class="painel"><div class="cab"><h2>Equipe dos produtores</h2></div><div class="corpo">
+      <div class="filtros">
+        <div class="campo"><label>Produtor</label>
+          <select value=${f.tenant} onChange=${e=>setF(x=>({...x,tenant:e.target.value}))}>
+            <option value="">Escolha…</option>
+            ${tenants.map(t=>html`<option key=${t.id} value=${t.id}>${t.nome}</option>`)}</select></div>
+        <div class="campo busca"><label>E-mail</label>
+          <input type="email" value=${f.email} onInput=${e=>setF(x=>({...x,email:e.target.value}))}/></div>
+        <div class="campo"><label>Papel</label>
+          <select value=${f.papel} onChange=${e=>setF(x=>({...x,papel:e.target.value}))}>
+            <option value="admin">Admin do produtor</option>
+            <option value="manager">Gerente</option>
+            <option value="finance">Financeiro</option>
+            <option value="checkin">Portaria</option></select></div>
+        <button class="btn" onClick=${vincular}>Liberar acesso</button>
+      </div>
+      ${!d ? html`<div class="esqueleto" style="height:70px"></div>`
+        : !d.membros.length ? html`<${Vazio} t="Ninguém vinculado"
+            s="Libere o acesso da equipe de cada produtor."/>`
+        : html`<div class="rolar"><table>
+          <thead><tr><th>Pessoa</th><th>Produtor</th><th>Papel</th><th>Status</th><th></th></tr></thead>
+          <tbody>${d.membros.map(m=>html`<tr key=${m.id}>
+            <td>${m.email||'—'}</td><td>${m.produtor}</td>
+            <td><${Tag} v=${m.papel}/></td><td><${Tag} v=${m.status}/></td>
+            <td class="dir"><button class="btn claro sm" onClick=${async()=>{
+              if(!confirm('Remover o acesso de '+(m.email||'')+'?')) return;
+              await rpc('mst_membro_remover',{p_id:m.id}); flash('Acesso removido'); carregar();
+            }}>Remover</button></td></tr>`)}</tbody></table></div>`}
+    </div></div>
+  </div>`;
+}
+
+/* ================== CONFIGURAÇÕES ================== */
+function Config({flash}){
+  const [c,setC] = useState(null); const [erro,setEr] = useState(''); const [ocupado,setOc]=useState(false);
+  useEffect(()=>{ rpc('mst_config_ler').then(d=>setC({
+    plataforma:{nome:'',dominio:'',email:'',whatsapp:'',...(d.plataforma||{})},
+    urls:{admin:'',app:'',api:'',...(d.urls||{})},
+    email:{remetente:'',resend:'',...(d.email||{})},
+    whatsapp:{provedor:'',status:'',...(d.whatsapp||{})}
+  }),e=>setEr(e.message)); },[]);
+
+  const set = (g,k,v) => setC(x=>({...x,[g]:{...x[g],[k]:v}}));
+
+  async function salvar(){
+    setOc(true);
+    try{ await rpc('mst_config_salvar',{p:c}); flash('Configurações salvas'); }
+    catch(e){ setEr(e.message); } finally{ setOc(false); }
+  }
+
+  if(erro) return html`<div class="erro">${erro}</div>`;
+  if(!c) return html`<div class="esqueleto" style="height:200px"></div>`;
+
+  return html`<div>
+    <div class="painel"><div class="cab"><h2>Plataforma</h2></div><div class="corpo"><div class="grade2">
+      <div class="campo"><label>Nome</label><input value=${c.plataforma.nome}
+        onInput=${e=>set('plataforma','nome',e.target.value)}/></div>
+      <div class="campo"><label>Domínio principal</label><input value=${c.plataforma.dominio}
+        onInput=${e=>set('plataforma','dominio',e.target.value)}/></div>
+      <div class="campo"><label>E-mail de contato</label><input value=${c.plataforma.email}
+        onInput=${e=>set('plataforma','email',e.target.value)}/></div>
+      <div class="campo"><label>WhatsApp</label><input value=${c.plataforma.whatsapp}
+        onInput=${e=>set('plataforma','whatsapp',e.target.value)}/></div>
+    </div></div></div>
+
+    <div class="painel"><div class="cab"><h2>Endereços</h2></div><div class="corpo"><div class="grade2">
+      <div class="campo"><label>Painel master</label><input class="num" value=${c.urls.admin}
+        onInput=${e=>set('urls','admin',e.target.value)}/></div>
+      <div class="campo"><label>Sistema de vendas</label><input class="num" value=${c.urls.app}
+        onInput=${e=>set('urls','app',e.target.value)}/></div>
+      <div class="campo"><label>API</label><input class="num" value=${c.urls.api}
+        onInput=${e=>set('urls','api',e.target.value)}/></div>
+    </div></div></div>
+
+    <div class="painel"><div class="cab"><h2>Entrega de ingresso</h2></div><div class="corpo"><div class="grade2">
+      <div class="campo"><label>Remetente dos e-mails</label><input value=${c.email.remetente}
+        onInput=${e=>set('email','remetente',e.target.value)}/></div>
+      <div class="campo"><label>Provedor de WhatsApp</label><input value=${c.whatsapp.provedor}
+        onInput=${e=>set('whatsapp','provedor',e.target.value)}/></div>
+    </div>
+    <div class="mute" style="font-size:12px">Chaves de API do Resend e do WhatsApp ficam nos secrets
+      das Edge Functions, nunca aqui.</div></div></div>
+
+    <button class="btn" disabled=${ocupado} onClick=${salvar}>${ocupado?'Salvando…':'Salvar configurações'}</button>
+  </div>`;
+}
+
+/* ================== LOGIN ================== */
+function Entrar(){
+  const [f,setF] = useState({email:'',senha:''});
+  const [erro,setEr] = useState(''); const [ocupado,setOc] = useState(false);
+
+  async function entrar(){
+    setOc(true); setEr('');
+    const {error} = await db.auth.signInWithPassword({email:f.email.trim(),password:f.senha});
+    setOc(false);
+    if(error) setEr('E-mail ou senha não conferem.');
+  }
+
+  return html`<div class="entrada"><div class="caixa">
+    <h1 class="dsp">Painel master</h1>
+    <p>Bilheto Digital — controle da plataforma.</p>
+    ${erro ? html`<div class="erro">${erro}</div>` : null}
+    <div class="campo"><label>E-mail</label>
+      <input type="email" autocomplete="username" value=${f.email}
+        onInput=${e=>setF(x=>({...x,email:e.target.value}))}
+        onKeyDown=${e=>e.key==='Enter'&&entrar()}/></div>
+    <div class="campo"><label>Senha</label>
+      <input type="password" autocomplete="current-password" value=${f.senha}
+        onInput=${e=>setF(x=>({...x,senha:e.target.value}))}
+        onKeyDown=${e=>e.key==='Enter'&&entrar()}/></div>
+    <button class="btn wide" disabled=${ocupado} onClick=${entrar}>${ocupado?'Entrando…':'Entrar'}</button>
+    <p class="mute" style="font-size:12px;margin-top:16px;margin-bottom:0">
+      Só contas registradas como master abrem este painel.</p>
+  </div></div>`;
+}
+
+/* ================== SHELL ================== */
+const ABAS = [
+  ['painel',    'Visão geral', 'operação'],
+  ['produtores','Produtores',  'operação'],
+  ['eventos',   'Eventos',     'operação'],
+  ['financeiro','Financeiro',  'dinheiro'],
+  ['taxas',     'Taxas',       'dinheiro'],
+  ['gateways',  'Gateways',    'dinheiro'],
+  ['dominios',  'Domínios',    'plataforma'],
+  ['acessos',   'Acessos',     'plataforma'],
+  ['auditoria', 'Auditoria',   'plataforma'],
+  ['config',    'Configurações','plataforma'],
+];
+const SUB = {
+  painel:'O estado da plataforma inteira, em um lugar.',
+  produtores:'Cada produtor é um ambiente isolado. Você vê todos.',
+  eventos:'Eventos de todos os produtores.',
+  financeiro:'Volume, taxas e repasse.',
+  taxas:'O que a plataforma cobra por venda.',
+  gateways:'SyncPay e Mercado Pago.',
+  dominios:'Subdomínios e domínios próprios.',
+  acessos:'Quem entra no master e na equipe de cada produtor.',
+  auditoria:'Tudo que foi feito aqui dentro.',
+  config:'Identidade e endereços da plataforma.',
+};
+
+function App(){
+  const [ses,setSes]   = useState(undefined);
+  const [boot,setBoot] = useState(null);
+  const [aba,setAba]   = useState(() => (location.hash||'#painel').slice(1));
+  const [toast,setTo]  = useState('');
+  const [resumo,setRe] = useState(null);
+
+  useEffect(()=>{ db.auth.getSession().then(({data})=>setSes(data.session));
+    const {data:sub} = db.auth.onAuthStateChange((_e,s)=>setSes(s));
+    return ()=>sub.subscription.unsubscribe(); },[]);
+
+  useEffect(()=>{ if(!ses){ setBoot(null); return; }
+    rpc('mst_bootstrap').then(setBoot, ()=>setBoot({master:false})); },[ses]);
+
+  useEffect(()=>{ if(!boot||!boot.master) return;
+    const [de,ate] = faixaDe('hoje');
+    Promise.all([rpc('mst_dashboard',{p_de:iso(de),p_ate:iso(ate)}), rpc('mst_gateways_resumo')])
+      .then(([d,g])=>setRe({d,g}),()=>{}); },[boot,aba]);
+
+  useEffect(()=>{ location.hash = '#'+aba; },[aba]);
+  const flash = m => { setTo(m); setTimeout(()=>setTo(''),2600); };
+
+  if(ses===undefined) return html`<div style="padding:40px"><div class="esqueleto" style="height:120px"></div></div>`;
+  if(!ses) return html`<${Entrar}/>`;
+  if(!boot) return html`<div style="padding:40px"><div class="esqueleto" style="height:120px"></div></div>`;
+
+  if(!boot.master) return html`<div class="entrada"><div class="caixa">
+    <h1 class="dsp">Sem acesso</h1>
+    <p>A conta <b>${boot.email}</b> não está registrada como master da plataforma.</p>
+    <div class="aviso" style="font-family:var(--num);font-size:11px">
+      insert into mst_masters (user_id, email)<br/>
+      select id, email from auth.users where email = '${boot.email}';</div>
+    <button class="btn claro wide" onClick=${()=>db.auth.signOut()}>Sair</button>
+  </div></div>`;
+
+  const tenants = boot.tenants || [];
+  const grupos  = ['operação','dinheiro','plataforma'];
+  const titulo  = (ABAS.find(a=>a[0]===aba)||ABAS[0])[1];
+
+  const gwSync = resumo && resumo.g.gateways.find(x=>x.gateway==='syncpay');
+  const gwMp   = resumo && resumo.g.gateways.find(x=>x.gateway==='mercadopago');
+
+  return html`<div class="app">
+    <aside class="rail">
+      <div class="marca"><span class="selo"></span>
+        <span><b>Bilheto Digital</b><small>painel master</small></span></div>
+      <nav class="nav">
+        ${grupos.map(g=>html`<div key=${g}>
+          <div class="grupo">${g}</div>
+          ${ABAS.filter(a=>a[2]===g).map(a=>html`
+            <button key=${a[0]} class=${aba===a[0]?'on':''} onClick=${()=>setAba(a[0])}>
+              <span class="ic"></span>${a[1]}</button>`)}
+        </div>`)}
+      </nav>
+      <div class="rodape">
+        <b>${boot.nome || boot.email}</b>
+        <span class="mute" style="font-size:11px">acesso master</span>
+        <button onClick=${()=>db.auth.signOut()}>Sair</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topo">
+        <div class="linha1">
+          <div><h1>${titulo}</h1><div class="sub">${SUB[aba]||''}</div></div>
+        </div>
+        <div class="barra">
+          <div class="cel"><small>Vendas hoje</small>
+            <b>${resumo ? brl(resumo.d.vendas.hoje) : '—'}</b></div>
+          <div class="cel"><small>Taxas hoje</small>
+            <b>${resumo ? brl(resumo.d.vendas.taxas_periodo) : '—'}</b></div>
+          <div class="cel"><small>Produtores ativos</small>
+            <b>${resumo ? nro(resumo.d.produtores.ativos) : '—'}</b></div>
+          <div class="cel"><small>Aguardando Pix</small>
+            <b>${resumo ? nro(resumo.d.vendas.pendentes) : '—'}</b></div>
+          <div class="cel"><small>SyncPay</small>
+            <b><span class=${'sinal '+(!gwSync?'off':(gwSync.erros?'err':(gwSync.produtores?'on':'off')))}></span>
+              ${gwSync ? (gwSync.produtores? gwSync.produtores+' ligados':'sem uso') : '—'}</b></div>
+          <div class="cel"><small>Mercado Pago</small>
+            <b><span class=${'sinal '+(!gwMp?'off':(gwMp.erros?'err':(gwMp.produtores?'on':'off')))}></span>
+              ${gwMp ? (gwMp.produtores? gwMp.produtores+' ligados':'sem uso') : '—'}</b></div>
+        </div>
+      </header>
+
+      <div class="tela">
+        ${aba==='painel'     ? html`<${Painel} flash=${flash}/>` : null}
+        ${aba==='produtores' ? html`<${Produtores} flash=${flash}/>` : null}
+        ${aba==='eventos'    ? html`<${Eventos} tenants=${tenants} flash=${flash}/>` : null}
+        ${aba==='financeiro' ? html`<${Financeiro} tenants=${tenants}/>` : null}
+        ${aba==='taxas'      ? html`<${Taxas} tenants=${tenants} flash=${flash}/>` : null}
+        ${aba==='gateways'   ? html`<${Gateways} tenants=${tenants} flash=${flash}/>` : null}
+        ${aba==='dominios'   ? html`<${Dominios} tenants=${tenants} flash=${flash}/>` : null}
+        ${aba==='acessos'    ? html`<${Acessos} tenants=${tenants} flash=${flash}/>` : null}
+        ${aba==='auditoria'  ? html`<${Auditoria} tenants=${tenants}/>` : null}
+        ${aba==='config'     ? html`<${Config} flash=${flash}/>` : null}
+      </div>
+    </main>
+
+    ${toast ? html`<div class="toast">${toast}</div>` : null}
+  </div>`;
+}
+
+const raiz = document.createElement('div');
+document.body.appendChild(raiz);
+render(html`<${App}/>`, raiz);
+window.__ok = true;
+const b = document.getElementById('boot'); if(b) b.remove();
+</script>
+</body>
+</html>
